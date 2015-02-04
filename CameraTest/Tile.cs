@@ -13,8 +13,8 @@ namespace CameraTest
 {
 	public class Tile
 	{
-		bool isPassable; 
-		int type;
+		public bool isPassable; 
+		public int type;
 		Vector2 position; 
 		Texture2D texture;
 		const int tileWidth = 64; 
@@ -24,10 +24,12 @@ namespace CameraTest
 		{
 			this.texture = texture;
 			numberOfTilesInTexture = texture.Width / Settings.gridsize;
+
 			this.type = tileType; 
+
 			this.position = position; 
 
-			if (type > 0)
+			if (type > 1)
 				isPassable = false;
 			else
 				isPassable = true; 
@@ -50,7 +52,43 @@ namespace CameraTest
 
 		public void Clicked()
 		{
-			type = 3; 
+			if (isPassable)
+				Console.WriteLine ("Passable");
+			else {
+				Console.WriteLine ("Not passable"); 
+
+			}
+			/*if (type < 3) {
+				isPassable = false; 
+				type = 3;
+			} else {
+				type = 0; 
+				isPassable = true; 
+			}*/
+
+		}
+
+		public bool isColliding(Rectangle otherRect)
+		{
+			Rectangle myRect = new Rectangle (
+				                   Convert.ToInt32 (position.X),
+				Convert.ToInt32 (position.Y),
+				                   texture.Width / numberOfTilesInTexture,
+				                   texture.Height);
+
+			if (myRect.Intersects (otherRect)) {
+				if (isPassable) {
+				
+					return false; 
+				} else {
+					return true; 
+
+				}
+
+
+			}
+
+			return false; 
 
 
 		}

@@ -1,6 +1,6 @@
 ﻿#region Using Statements
 using System;
-
+using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Storage;
@@ -15,52 +15,28 @@ namespace CameraTest
 		public int width; 
 		public int height; 
 
-		float xSpeed;
-		float ySpeed; 
+		public List<Tile> visibleTiles; 
+
 
 		public Vector2 position; 
 
 		public Camera ()
 		{
 			position = new Vector2 (0, 0); 
-			width = 12; 
-			height = 6;
+			width = 32; 
+			height = 18;
 
-			xSpeed = 0; 
-			ySpeed = 0; 
+
+			visibleTiles = new List<Tile> (); 
 
 		}
 
-		public void Update()
+		public void Update(Vector2 playerPos)
 		{
-
-			KeyboardState newState = Keyboard.GetState (); 
-
-			if (newState.IsKeyDown (Keys.Up)) {
-				 
-				ySpeed -= 0.5f; 
-			}
-
-			if (newState.IsKeyDown (Keys.Down)) {
-
-				ySpeed += 0.5f; 
-			}
+			position.X = playerPos.X - ((width* Settings.gridsize) / 2); 
+			position.Y = playerPos.Y - (((height * Settings.gridsize) / 2)+100); 
 
 
-			if (newState.IsKeyDown (Keys.Left)) {
-				xSpeed -= 0.5f;
-
-			}
-
-
-			if (newState.IsKeyDown (Keys.Right)) {
-				xSpeed += 0.5f; 
-
-
-			}
-			 
-			position.X += xSpeed;
-			position.Y += ySpeed; 
 		}
 	}
 }

@@ -19,13 +19,18 @@ namespace CameraTest
 		SpriteBatch spriteBatch;
 		Camera cam; 
 		World tellus; 
-		myMouse mouse;
+		Player player; 
+		myMouse mouse; 
 
 		public Game1 ()
 		{
 			graphics = new GraphicsDeviceManager (this);
 			Content.RootDirectory = "Content";	            
-			graphics.IsFullScreen = true;		
+			graphics.IsFullScreen = true;
+			graphics.PreferredBackBufferWidth = 1800;  // set this value to the desired width of your window
+			graphics.PreferredBackBufferHeight = 1200;   // set this value to the desired height of your window
+			graphics.ApplyChanges();
+			graphics.ApplyChanges (); 
 		}
 
 		/// <summary>
@@ -52,7 +57,8 @@ namespace CameraTest
 			Texture2D tile_texture = Content.Load<Texture2D> ("tile"); 
 			tellus = new World (tile_texture); 
 			cam = new Camera (); 
-			mouse = new myMouse( Content.Load<Texture2D> ("cross")); 
+			player = new Player (Content.Load<Texture2D>("fighter"), new Vector2 (100, 0), Keys.D, Keys.A, Keys.Space); 
+			mouse = new myMouse (Content.Load<Texture2D> ("cross")); 
 
 			//TODO: use this.Content to load your game content here 
 		}
@@ -69,7 +75,8 @@ namespace CameraTest
 				Exit ();
 			}
 
-			cam.Update (); 
+			cam.Update (player.position); 
+			player.Update (cam, tellus); 
 			mouse.Update (cam, tellus); 
 			// TODO: Add your update logic here			
 			base.Update (gameTime);
@@ -88,8 +95,9 @@ namespace CameraTest
 
 			//draw the world, send the camera
 			tellus.Draw (spriteBatch, cam); 
-			mouse.Draw (spriteBatch); 
 
+			player.Draw (spriteBatch,cam); 
+			mouse.Draw (spriteBatch); 
 			spriteBatch.End (); 
 			base.Draw (gameTime);
 		}

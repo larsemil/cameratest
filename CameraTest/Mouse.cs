@@ -34,9 +34,12 @@ namespace CameraTest
 			if ((mousestate.LeftButton == ButtonState.Pressed) && (laststate.LeftButton != ButtonState.Pressed)) {
 				int x = (Convert.ToInt32(cam.position.X + position.X)) / Settings.gridsize;
 				int y = (Convert.ToInt32(cam.position.Y + position.Y)) / Settings.gridsize;
-
-				tellus.map [x, y].Clicked (); 
-
+				try{
+					tellus.map [x, y].Clicked (); 
+				}
+				catch( IndexOutOfRangeException e){
+					return; 
+				}
 			}
 
 		}
