@@ -33,8 +33,8 @@ namespace CameraTest
 
 		public void Update(Vector2 playerPos)
 		{
-			position.X = playerPos.X - ((width* Settings.gridsize) / 2); 
-			position.Y = playerPos.Y - (((height * Settings.gridsize) / 2)+100); 
+			position.X = playerPos.X - (((float)width * (float)Settings.gridsize) / 2.0f); 
+			position.Y = playerPos.Y - ((((float)height * (float)Settings.gridsize) / 2.0f)+100.0f); 
 
 
 		}

@@ -16,7 +16,7 @@ namespace CameraTest
 		private Actions action;
 
 
-		private const int speed = 15;
+		private const int speed = 5;
 		bool inAir; 
 
 		int jumpForce = 0; 

@@ -57,7 +57,7 @@ namespace CameraTest
 			Texture2D tile_texture = Content.Load<Texture2D> ("tile"); 
 			tellus = new World (tile_texture); 
 			cam = new Camera (); 
-			player = new Player (Content.Load<Texture2D>("fighter"), new Vector2 (100, 0), Keys.D, Keys.A, Keys.Space); 
+			player = new Player (Content.Load<Texture2D>("fighter"), new Vector2 (1500, 2000), Keys.D, Keys.A, Keys.Space); 
 			mouse = new myMouse (Content.Load<Texture2D> ("cross")); 
 
 			//TODO: use this.Content to load your game content here 
