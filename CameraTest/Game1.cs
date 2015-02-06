@@ -29,7 +29,7 @@ namespace CameraTest
 			graphics.IsFullScreen = true;
 			graphics.PreferredBackBufferWidth = 1800;  // set this value to the desired width of your window
 			graphics.PreferredBackBufferHeight = 1200;   // set this value to the desired height of your window
-			graphics.ApplyChanges();
+
 			graphics.ApplyChanges (); 
 		}
 
@@ -55,9 +55,13 @@ namespace CameraTest
 			// Create a new SpriteBatch, which can be used to draw textures.
 			spriteBatch = new SpriteBatch (GraphicsDevice);
 			Texture2D tile_texture = Content.Load<Texture2D> ("tile"); 
-			tellus = new World (tile_texture); 
+			Texture2D enemyTexture = Content.Load<Texture2D> ("enemy"); 
+
+			tellus = new World (tile_texture, enemyTexture); 
+
 			cam = new Camera (); 
-			player = new Player (Content.Load<Texture2D>("fighter"), new Vector2 (1500, 2000), Keys.D, Keys.A, Keys.Space); 
+
+			player = new Player (Content.Load<Texture2D>("fighter2"), new Vector2 (70, 70), Keys.D, Keys.A, Keys.Space); 
 			mouse = new myMouse (Content.Load<Texture2D> ("cross")); 
 
 			//TODO: use this.Content to load your game content here 
@@ -76,6 +80,7 @@ namespace CameraTest
 			}
 
 			cam.Update (player.position); 
+			tellus.Update (cam); 
 			player.Update (cam, tellus); 
 			mouse.Update (cam, tellus); 
 			// TODO: Add your update logic here			

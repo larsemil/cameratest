@@ -19,13 +19,16 @@ namespace CameraTest
 		public Tile[,] map; 
 		int numberOfTilesInTexture; 
 		public int gravity;
+		List <Enemies> enemies; 
 
-		public World (Texture2D texture)
+		public World (Texture2D texture, Texture2D enemyTexture)
 		{
 			gravity = 9; 
 			this.texture = texture;
 
 			Bitmap level = new Bitmap ("Content/level.png");
+			enemies = new List<Enemies> (); 
+
 
 			worldSize = level.Width;
 
@@ -38,10 +41,23 @@ namespace CameraTest
 				for (int y = 0; y < worldSize; y++) {
 					System.Drawing.Color tmpCol = level.GetPixel (x, y);
 
-					if (tmpCol == System.Drawing.Color.FromArgb(0,0,0))
-						map [x, y] = new Tile (3, new Vector2 (x * (texture.Width / numberOfTilesInTexture), y * (texture.Height)), texture);
-					else if (tmpCol == System.Drawing.Color.FromArgb (255, 255, 255)) {
-						map [x, y] = new Tile (rnd.Next(0,2), new Vector2 (x * (texture.Width / numberOfTilesInTexture), y * (texture.Height)), texture);
+					if (tmpCol == System.Drawing.Color.FromArgb (0, 0, 0)) {
+						map [x, y] = new Tile (3, new Vector2 (x * (texture.Width / numberOfTilesInTexture), y * (texture.Height / numberOfTilesInTexture)), texture, rnd);
+
+						
+					} else if (tmpCol == System.Drawing.Color.FromArgb (0, 255, 0)) {
+
+						map [x, y] = new Tile (1, new Vector2 (x * (texture.Width / numberOfTilesInTexture), y * (texture.Height / numberOfTilesInTexture)), texture, rnd);
+					} else if (tmpCol == System.Drawing.Color.FromArgb (0, 0, 255)) {
+						map [x, y] = new Tile (2, new Vector2 (x * (texture.Width / numberOfTilesInTexture), y * (texture.Height / numberOfTilesInTexture)), texture, rnd);
+					
+					} else if (tmpCol == System.Drawing.Color.FromArgb (255, 0, 0)) {
+						map [x, y] = new Tile (0, new Vector2 (x * (texture.Width / numberOfTilesInTexture), y * (texture.Height / numberOfTilesInTexture)), texture, rnd);
+						enemies.Add (new Enemies (enemyTexture, new Vector2 (x * Settings.gridsize, y * Settings.gridsize)));
+
+					}
+					else{
+						map [x, y] = new Tile (0, new Vector2 (x * (texture.Width / numberOfTilesInTexture), y * (texture.Height / numberOfTilesInTexture)), texture, rnd);
 					}
 				}
 
@@ -64,17 +80,36 @@ namespace CameraTest
 				for (int y = (int)((cam.position.Y / Settings.gridsize)); y <= ((cam.position.Y / Settings.gridsize) + cam.height +1); y++) {
 
 					//För varje ruta så gör vi en rektangel-
-					Microsoft.Xna.Framework.Rectangle tileRect = new Microsoft.Xna.Framework.Rectangle (x * (texture.Width / numberOfTilesInTexture), y * texture.Height, texture.Width / numberOfTilesInTexture, texture.Height);
+					Microsoft.Xna.Framework.Rectangle tileRect = new Microsoft.Xna.Framework.Rectangle (x * (texture.Width / numberOfTilesInTexture), y * (texture.Height / numberOfTilesInTexture), texture.Width / numberOfTilesInTexture, texture.Height / numberOfTilesInTexture);
 
 					//och så kollar vi om rektangeln för rutan är inom rektangeln för kameran.
 					if(tileRect.Intersects(camRect)){
 
 						//isåfall så ritar vi ut den. vi skickar med kamerans position för att kunna offsetta det vi ritar ut. 
-						cam.visibleTiles.Add(map [x, y]);
-						map [x, y].Draw (spriteBatch,cam.position);	
-						  
+						try{
+							cam.visibleTiles.Add(map [x, y]);
+							map [x, y].Draw (spriteBatch,cam.position);	
+						}
+						catch
+						{
+							continue; 
+						}
 					}
 				}
+			}
+
+
+			foreach (var enemy in enemies) {
+				enemy.Draw (spriteBatch, cam); 
+
+			}
+
+		}
+
+		public void Update(Camera cam)
+		{
+			foreach (var enemy in enemies) {
+				enemy.Update(this, cam); 
 			}
 
 		}

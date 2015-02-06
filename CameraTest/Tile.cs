@@ -20,16 +20,21 @@ namespace CameraTest
 		const int tileWidth = 64; 
 		int numberOfTilesInTexture;
 
-		public Tile (int tileType, Vector2 position, Texture2D texture )
+		int randTexture; 
+
+		public Tile (int tileType, Vector2 position, Texture2D texture, Random rnd)
 		{
 			this.texture = texture;
 			numberOfTilesInTexture = texture.Width / Settings.gridsize;
 
 			this.type = tileType; 
 
+
+			this.randTexture = rnd.Next (0,4); 
+
 			this.position = position; 
 
-			if (type > 1)
+			if (type > 0)
 				isPassable = false;
 			else
 				isPassable = true; 
@@ -42,10 +47,10 @@ namespace CameraTest
 			//ny position = originalpositionen - kamerans offset(kamerans position). 
 			// så om kameran har flyttats 100px till höger, så måste vi dra av 100px från positionen. 
 			Vector2 drawPos = position - camOffset;
-
+		 
 			//Rita ut rutan
 			spriteBatch.Draw (texture, drawPos, 
-				new Rectangle (type * tileWidth, 0 , texture.Width / numberOfTilesInTexture, texture.Height),
+				new Rectangle (type * tileWidth, randTexture * tileWidth , texture.Width / numberOfTilesInTexture, texture.Height),
 				Color.White);
 
 		}
@@ -58,13 +63,10 @@ namespace CameraTest
 				Console.WriteLine ("Not passable"); 
 
 			}
-			/*if (type < 3) {
-				isPassable = false; 
-				type = 3;
-			} else {
-				type = 0; 
+			if (type  == 2) {
 				isPassable = true; 
-			}*/
+				type = 0;
+			} 
 
 		}
 
@@ -74,7 +76,7 @@ namespace CameraTest
 				                   Convert.ToInt32 (position.X),
 				Convert.ToInt32 (position.Y),
 				                   texture.Width / numberOfTilesInTexture,
-				                   texture.Height);
+				texture.Height /numberOfTilesInTexture);
 
 			if (myRect.Intersects (otherRect)) {
 				if (isPassable) {
