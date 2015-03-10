@@ -12,31 +12,21 @@ using Microsoft.Xna.Framework.Input;
 namespace CameraTest
 {
 
-	public class Player{
-		private Actions action;
+	public class Player:PhysicalObject{
 
-
-		private const int speed = 5;
-		bool inAir; 
-
-		int jumpForce = 0; 
 		private Keys Right;
 		private Keys Left;
 		private Keys Jump;
-		enum Directions {Left, Right, None}; 
-		
-		private Directions direction; 
-		private Texture2D texture;
-		public Vector2 position;
 
-		private bool isAlive;
+	
+		Texture2D heartTexture; 
+		//private bool isAlive;
+		int wasHit;
+		int damage; 
 
-
-
-		public Player (Texture2D texture, Vector2 position, Keys right, Keys left, Keys jump)
+		public Player (Texture2D texture, Vector2 position, Keys right, Keys left, Keys jump, Texture2D heartTexture)
+			:base(texture, position)
 		{
-			this.texture = texture;
-			this.position = position;
 
 			this.Right = right;
 			this.Left = left; 
@@ -46,6 +36,15 @@ namespace CameraTest
 			action = Actions.falling;
 			isAlive = true; 
 			inAir = true; 
+			speed = 5; 
+			weight = 1; 
+			health = 100;
+			damage = 0;
+
+			wasHit = 0; 
+			spritesHigh = 3; 
+			this.heartTexture = heartTexture; 
+
 
 		}
 
@@ -71,8 +70,8 @@ namespace CameraTest
 				}
 				else{
 					action = Actions.jumping;
-					jumpForce = 30; 
-					Console.WriteLine ("JUMPING!"); 
+					jumpForce = 30;
+				 
 				}
 
 			} 
@@ -80,12 +79,18 @@ namespace CameraTest
 			if (inAir ) {
 				position.Y += tellus.gravity - jumpForce; 
 
-				if (jumpForce-- < 0)
+				if (jumpForce-- < 0) {
 					action = Actions.falling;
+					if (jumpForce <= -60)
+						jumpForce = -60; 
+				}
 			}
 
 			this.checkCollision (cam, tellus); 
+			//addGravity (tellus); 
 
+			if (wasHit > 0)
+				wasHit--; 
 		}
 
 		public void checkCollision(Camera cam, World tellus)
@@ -141,8 +146,8 @@ namespace CameraTest
 				inAir = true; 
 			}
 
-			 
 
+			 
 			//then we check if we WALK into something to the sides
 			if (direction == Directions.Left) {
 
@@ -208,7 +213,19 @@ namespace CameraTest
 
 		}
 
-		public void Draw(SpriteBatch spriteBatch, Camera cam)
+		public override void Hit(int damage)
+		{
+			if (wasHit <= 0) {
+				this.damage += damage; 
+
+				wasHit = 100; 
+				jumpForce = 25; 
+
+			}
+
+		}
+
+		public void Draw(SpriteBatch spriteBatch, Camera cam, GameWindow window)
 		{
 
 			//vi måste räkna ut positionen i förhållande till kameran.
@@ -216,17 +233,45 @@ namespace CameraTest
 			//ny position = originalpositionen - kamerans offset(kamerans position). 
 			// så om kameran har flyttats 100px till höger, så måste vi dra av 100px från positionen. 
 			Vector2 drawPos = position - cam.position;
-			 
-			if (direction == Directions.Right)
-				spriteBatch.Draw (texture, drawPos, new Rectangle (0, (int)action * (texture.Height / 3), texture.Width, texture.Height / 3), Color.AliceBlue);
-			else {
 
-				spriteBatch.Draw(texture, drawPos,null, new Rectangle(0,(int)action * (texture.Height / 3),texture.Width, texture.Height / 3),  null, 0, null, Color.White, SpriteEffects.FlipHorizontally,0);
+			//check to see if recently hit, if so, blink
+			if (wasHit > 0) {
+				if ((wasHit % 4) == 1) {
+					if (direction == Directions.Right)
+						spriteBatch.Draw (texture, drawPos, new Rectangle (0, (int)action * (texture.Height / 3), texture.Width, texture.Height / 3), Color.AliceBlue);
+					else {
+
+						spriteBatch.Draw (texture, drawPos, null, new Rectangle (0, (int)action * (texture.Height / 3), texture.Width, texture.Height / 3), null, 0, null, Color.White, SpriteEffects.FlipHorizontally, 0);
+					}
+				}
+			} else {
+
+				if (direction == Directions.Right)
+					spriteBatch.Draw (texture, drawPos, new Rectangle (0, (int)action * (texture.Height / 3), texture.Width, texture.Height / 3), Color.AliceBlue);
+				else {
+
+					spriteBatch.Draw (texture, drawPos, null, new Rectangle (0, (int)action * (texture.Height / 3), texture.Width, texture.Height / 3), null, 0, null, Color.White, SpriteEffects.FlipHorizontally, 0);
+				}
 			}
+
+
+
+			//render health
+			for (int i = 0; i < 10; i++) {
+				if ((i * 10) < (health - damage)) {
+
+					spriteBatch.Draw (heartTexture, new Vector2 ((i* (heartTexture.Width+5)) , 40), new Rectangle (0, 0, heartTexture.Width, heartTexture.Height / 2), Color.AliceBlue);
+
+				} else {
+					spriteBatch.Draw (heartTexture, new Vector2 ((i* (heartTexture.Width+5)), 40), new Rectangle (0, heartTexture.Height / 2, heartTexture.Width, heartTexture.Height / 2), Color.AliceBlue);
+				}
+
+			}
+
+
+
 		}
 
-	
-	
 	
 	} //end of class
 

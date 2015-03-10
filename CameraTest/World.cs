@@ -16,12 +16,13 @@ namespace CameraTest
 	{
 		int worldSize; 
 		Texture2D texture; 
+
 		public Tile[,] map; 
 		int numberOfTilesInTexture; 
 		public int gravity;
 		List <Enemies> enemies; 
 
-		public World (Texture2D texture, Texture2D enemyTexture)
+		public World (Texture2D texture, Texture2D enemyTexture, Texture2D rotatingEnemyTexture)
 		{
 			gravity = 9; 
 			this.texture = texture;
@@ -37,6 +38,8 @@ namespace CameraTest
 			numberOfTilesInTexture = texture.Width / Settings.gridsize;
 			Random rnd = new Random (); 
 			//loop through the level and generate world
+
+
 			for (int x = 0; x < worldSize; x++) {
 				for (int y = 0; y < worldSize; y++) {
 					System.Drawing.Color tmpCol = level.GetPixel (x, y);
@@ -53,9 +56,20 @@ namespace CameraTest
 					
 					} else if (tmpCol == System.Drawing.Color.FromArgb (255, 0, 0)) {
 						map [x, y] = new Tile (0, new Vector2 (x * (texture.Width / numberOfTilesInTexture), y * (texture.Height / numberOfTilesInTexture)), texture, rnd);
-						enemies.Add (new Enemies (enemyTexture, new Vector2 (x * Settings.gridsize, y * Settings.gridsize)));
 
+						if (rnd.Next (0, 10) > 5) {
+							enemies.Add (new jumperEnemy (enemyTexture, new Vector2 (x * Settings.gridsize, y * Settings.gridsize)));
+						} else {
+							enemies.Add (new Enemies (enemyTexture, new Vector2 (x * Settings.gridsize, y * Settings.gridsize)));
+
+						}
+
+					} else if (tmpCol == System.Drawing.Color.FromArgb (255, 139, 0)) {
+						map [x, y] = new Tile (0, new Vector2 (x * (texture.Width / numberOfTilesInTexture), y * (texture.Height / numberOfTilesInTexture)), texture, rnd);
+						enemies.Add (new rotatingEnemy (rotatingEnemyTexture, new Vector2 (x * Settings.gridsize, y * Settings.gridsize)));
+						Console.WriteLine (new Vector2 (x * Settings.gridsize, y * Settings.gridsize)); 
 					}
+
 					else{
 						map [x, y] = new Tile (0, new Vector2 (x * (texture.Width / numberOfTilesInTexture), y * (texture.Height / numberOfTilesInTexture)), texture, rnd);
 					}
@@ -106,11 +120,29 @@ namespace CameraTest
 
 		}
 
-		public void Update(Camera cam)
+		public void Update(Camera cam, Player player)
 		{
 			foreach (var enemy in enemies) {
-				enemy.Update(this, cam); 
+				//only update enemies within certain distance. 
+				//TODO: Now it updates enemies on lower levens, even if they are FAR away on he level
+				// that can be solved by designing map better. ;) 
+				if(measureDistance(player.position, enemy.position) < 2000)
+					enemy.Update(this, cam, player);
+
+
 			}
+
+		}
+
+		public double measureDistance(Vector2 posA, Vector2 posB)
+		{
+
+			var Distance = Math.Sqrt (
+				                 Math.Pow ((Math.Max (posA.X, posB.X) - Math.Min (posA.X, posB.X)), 2) +
+				                 Math.Pow ((Math.Max (posA.Y, posB.Y) - Math.Min (posA.Y, posB.Y)), 2)
+			                 );
+
+			return Distance; 
 
 		}
 	}

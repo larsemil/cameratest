@@ -56,12 +56,13 @@ namespace CameraTest
 			spriteBatch = new SpriteBatch (GraphicsDevice);
 			Texture2D tile_texture = Content.Load<Texture2D> ("tile"); 
 			Texture2D enemyTexture = Content.Load<Texture2D> ("enemy"); 
+			Texture2D heartTexture = Content.Load <Texture2D> ("heart"); 
+			Texture2D rotatingEnemyTexture = Content.Load<Texture2D> ("williamo"); 
 
-			tellus = new World (tile_texture, enemyTexture); 
-
+			tellus = new World (tile_texture, enemyTexture, rotatingEnemyTexture); 
 			cam = new Camera (); 
 
-			player = new Player (Content.Load<Texture2D>("fighter2"), new Vector2 (70, 70), Keys.D, Keys.A, Keys.Space); 
+			player = new Player (Content.Load<Texture2D>("fighter"), new Vector2 (70, 70), Keys.D, Keys.A, Keys.Space,heartTexture); 
 			mouse = new myMouse (Content.Load<Texture2D> ("cross")); 
 
 			//TODO: use this.Content to load your game content here 
@@ -80,9 +81,9 @@ namespace CameraTest
 			}
 
 			cam.Update (player.position); 
-			tellus.Update (cam); 
+			tellus.Update (cam, player); 
 			player.Update (cam, tellus); 
-			mouse.Update (cam, tellus); 
+			mouse.Update (cam, tellus, player); 
 			// TODO: Add your update logic here			
 			base.Update (gameTime);
 		}
@@ -101,7 +102,7 @@ namespace CameraTest
 			//draw the world, send the camera
 			tellus.Draw (spriteBatch, cam); 
 
-			player.Draw (spriteBatch,cam); 
+			player.Draw (spriteBatch,cam, Window); 
 			mouse.Draw (spriteBatch); 
 			spriteBatch.End (); 
 			base.Draw (gameTime);
